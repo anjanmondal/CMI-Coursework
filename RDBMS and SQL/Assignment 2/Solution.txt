@@ -1,0 +1,373 @@
+Name: Anjan Mondal
+Roll No: MDS202208
+
+RDBMS Assignment 2
+
+-------------------------------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------------------------------
+
+Answer 1:
+
+SELECT courses.name as coursename, COUNT(courses.name) as numberofstudentsenrolled
+FROM courses JOIN grades
+ON courses.coursecode=grades.coursecode
+GROUP BY courses.name
+HAVING COUNT(courses.name) = 
+(SELECT MAX(numberofstudentsenrolled) FROM
+(select COUNT(courses.name) as numberofstudentsenrolled, courses.name
+FROM courses JOIN grades
+ON courses.coursecode=grades.coursecode
+GROUP BY courses.name) as foo ) 
+
+
+
+ coursename | numberofstudentsenrolled
+------------+--------------------------
+ Charms     |                       33
+(1 row)
+
+
+
+
+
+-------------------------------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------------------------------
+
+Answer 2:
+
+
+SELECT name, COUNT(grades.Coursecode) as numcourses
+FROM grades 
+NATURAL JOIN students
+GROUP BY students.Name
+HAVING COUNT(grades.Coursecode) = (SELECT MAX(num_c) FROM
+(SELECT COUNT(grades.Coursecode) as num_C, grades.Rollno
+FROM grades GROUP BY Rollno) as max_c);
+
+
+        name         | numcourses
+---------------------+------------
+ Ciceron Harkiss     |          6
+ Gellert Grindelwald |          6
+(2 rows)
+
+-------------------------------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------------------------------
+
+Answer 3:
+
+
+SELECT name, count as distinctgrades
+FROM students NATURAL JOIN
+(SELECT DISTINCT Rollno, COUNT(DISTINCT(Grade)) FROM grades GROUP BY Rollno) as x
+WHERE count=(SELECT MAX(count)  FROM 
+students NATURAL JOIN
+(SELECT DISTINCT Rollno, COUNT(DISTINCT(Grade)) FROM grades GROUP BY Rollno) as max_count)
+
+
+        name         | distinctgrades
+---------------------+----------------
+ Euan Abercrombie    |              4
+ Marcus Belby        |              4
+ Katie Bell          |              4
+ Millicent Bulstrode |              4
+ Eddie Carmichael    |              4
+ Cho Chang           |              4
+ Michael Corner      |              4
+ Gellert Grindelwald |              4
+ Davey Gudgeon       |              4
+(9 rows)
+
+-------------------------------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------------------------------
+
+Answer 4: 
+
+SELECT Name, GPA FROM Courses JOIN
+(SELECT Coursecode, AVG(Gradepoint) as GPA FROM Gradepoint 
+JOIN grades ON Gradepoint.Lettergrade = grades.Grade
+GROUP BY Coursecode) AS gpa_t
+ON gpa_t.Coursecode=Courses.Coursecode;
+
+
+             name              |        gpa
+-------------------------------+--------------------
+ Arithmancy                    | 8.3333333333333333
+ Charms                        | 7.3030303030303030
+ Defence Against the Dark ARTS | 7.2857142857142857
+ Divination                    | 7.6666666666666667
+ Herbology                     | 6.8888888888888889
+ History of Magic              | 7.3548387096774194
+ Potions                       | 8.2631578947368421
+ Transfiguration               | 8.1363636363636364
+(8 rows)
+
+-------------------------------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------------------------------
+
+Answer 5:
+
+ 
+SELECT Name, GPA FROM Students JOIN
+(SELECT Rollno, AVG(Gradepoint) as GPA FROM Gradepoint 
+JOIN grades ON Gradepoint.Lettergrade = grades.Grade
+GROUP BY Rollno) AS gpa_t
+ON gpa_t.Rollno=Students.Rollno;
+
+
+          name          |         gpa
+------------------------+---------------------
+ Hannah Abbott          |  9.0000000000000000
+ Euan Abercrombie       |  7.5000000000000000
+ Stewart Ackerley       |  7.7500000000000000
+ Bertram Aubrey         |  7.0000000000000000
+ Avery                  |  8.0000000000000000
+ Malcolm Baddock        |  6.7500000000000000
+ Marcus Belby           |  8.2500000000000000
+ Katie Bell             |  7.7500000000000000
+ Sirius Orion Black     |  9.0000000000000000
+ Melinda Bobbin         |  9.5000000000000000
+ Susan Bones            |  7.2500000000000000
+ Terry Boot             |  6.5000000000000000
+ Eleanor Branstone      |  7.2500000000000000
+ Mandy Brocklehurst     |  7.2500000000000000
+ Lavender Brown         |  7.0000000000000000
+ Millicent Bulstrode    |  6.0000000000000000
+ S. Capper              |  6.5000000000000000
+ Eddie Carmichael       |  6.7500000000000000
+ Owen Cauldwell         |  9.0000000000000000
+ Cho Chang              |  7.5000000000000000
+ Michael Corner         |  7.7500000000000000
+ Gregory Goyle          |  5.0000000000000000
+ Hermione Jean Granger  |  7.6000000000000000
+ Daphne Greengrass      |  8.0000000000000000
+ Gellert Grindelwald    |  8.8333333333333333
+ Davey Gudgeon          |  7.8000000000000000
+ Rubeus Hagrid          |  7.2000000000000000
+ Ciceron Harkiss        |  7.0000000000000000
+ Geoffrey Hooper        |  8.6000000000000000
+ Olive Hornby           |  7.0000000000000000
+ Angelina Johnson       |  7.0000000000000000
+ Lee Jordan             |  9.0000000000000000
+ Viktor Krum            |  6.0000000000000000
+ Neville Longbottom     |  4.0000000000000000
+ Luna Lovegood          |  8.0000000000000000
+ Mary Macdonald         |  7.0000000000000000
+ Oliver Wood            |  9.0000000000000000
+ Isobel MacDougal       |  6.0000000000000000
+ Laura Madley           |  9.0000000000000000
+ Draco Malfoy           |  7.0000000000000000
+ Natalie McDonald       |  5.0000000000000000
+ M. G. McGonagall       |  7.0000000000000000
+ Eloise Midgen          |  6.0000000000000000
+ Laverne de Montmorency |  6.0000000000000000
+ Montgomery sisters     |  8.0000000000000000
+ Lily Moon              |  9.0000000000000000
+ Harold Potter          |  9.0000000000000000
+ Theodore Nott          |  9.0000000000000000
+ Garrick Ollivander     | 10.0000000000000000
+ Pansy Parkinson        |  8.0000000000000000
+ Padma Patil            |  9.0000000000000000
+ Parvati Patil          | 10.0000000000000000
+(52 rows)
+
+
+-------------------------------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------------------------------
+
+Answer 6: 
+
+SELECT x.Coursename, instructors.Instructor as teachername
+FROM instructors 
+JOIN
+(SELECT inst_gpa.instructor, coursename, inst_gpa.gpa
+FROM 
+(SELECT courses.name as coursename, gpa_t.GPA, Courses.Instructor 
+FROM courses
+JOIN (SELECT Coursecode, AVG(Gradepoint) as GPA FROM Gradepoint 
+JOIN grades ON Gradepoint.Lettergrade = grades.Grade
+GROUP BY Coursecode) AS gpa_t
+ON gpa_t.Coursecode=courses.coursecode )  as inst_gpa) as x
+ON instructors.instcode=x.instructor
+WHERE x.gpa=(SELECT MAX(inst_gpa.gpa)
+FROM 
+(SELECT courses.name as coursename, gpa_t.GPA, Courses.Instructor 
+FROM courses
+JOIN (SELECT Coursecode, AVG(Gradepoint) as GPA FROM Gradepoint 
+JOIN grades ON Gradepoint.Lettergrade = grades.Grade
+GROUP BY Coursecode) AS gpa_t
+ON gpa_t.Coursecode=courses.coursecode )  as inst_gpa)
+
+ coursename |  teachername
+------------+----------------
+ Arithmancy | Septima Vector
+(1 row)
+
+-------------------------------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------------------------------
+
+Answer 7:
+
+SELECT Name, GPA FROM Students JOIN
+(SELECT Rollno, AVG(Gradepoint) as GPA FROM Gradepoint 
+JOIN grades ON Gradepoint.Lettergrade = grades.Grade
+GROUP BY Rollno) AS gpa_t
+ON gpa_t.Rollno=Students.Rollno
+
+WHERE GPA=(SELECT MAX(GPA) FROM Students JOIN
+(SELECT Rollno, AVG(Gradepoint) as GPA FROM Gradepoint 
+JOIN grades ON Gradepoint.Lettergrade = grades.Grade
+GROUP BY Rollno) AS gpa_t
+ON gpa_t.Rollno=Students.Rollno);
+
+name        |         gpa
+--------------------+---------------------
+ Garrick Ollivander | 10.0000000000000000
+ Parvati Patil      | 10.0000000000000000
+(2 rows)
+
+
+-------------------------------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------------------------------
+
+Answer 8:
+
+SELECT students.name as studentname, houses.housename as housename, gpa
+FROM students JOIN
+(SELECT gpa_t.Rollno, h_gpa.housecode, h_gpa.gpa FROM
+(SELECT Rollno, AVG(Gradepoint) as GPA FROM Gradepoint 
+JOIN grades ON Gradepoint.Lettergrade = grades.Grade
+GROUP BY Rollno) AS gpa_t
+JOIN
+(SELECT SUBSTRING(gpa_t.rollno, 1,3) as housecode, MAX(gpa_t.GPA) as gpa FROM
+(SELECT Rollno, AVG(Gradepoint) as GPA FROM Gradepoint 
+JOIN grades ON Gradepoint.Lettergrade = grades.Grade
+GROUP BY Rollno) AS gpa_t
+GROUP BY housecode) as h_gpa
+ON 
+h_gpa.housecode= SUBSTRING(gpa_t.Rollno, 1,3)
+AND 
+h_gpa.gpa=gpa_t.gpa) as max_hgpa
+ON 
+students.rollno=max_hgpa.rollno
+JOIN 
+houses
+ON max_hgpa.housecode = houses.housecode
+
+
+
+    studentname     | housename  |         gpa
+--------------------+------------+---------------------
+ Parvati Patil      | Gryffindor | 10.0000000000000000
+ Garrick Ollivander | Gryffindor | 10.0000000000000000
+ Lee Jordan         | Hufflepuff |  9.0000000000000000
+ Laura Madley       | Ravenclaw  |  9.0000000000000000
+ Oliver Wood        | Ravenclaw  |  9.0000000000000000
+ Melinda Bobbin     | Slytherin  |  9.5000000000000000
+(6 rows)
+
+-------------------------------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------------------------------
+
+Answer 9:
+
+
+SELECT housename, GPA FROM 
+houses JOIN
+(SELECT SUBSTRING(rollno,1,3) as housecode, AVG(gpa) as gpa FROM 
+(SELECT Rollno, AVG(Gradepoint) as GPA FROM Gradepoint 
+JOIN grades ON Gradepoint.Lettergrade = grades.Grade
+GROUP BY Rollno) as gpa_t
+GROUP BY SUBSTRING(rollno,1,3)) as h_gpa
+ON h_gpa.housecode=houses.housecode
+
+
+housename  |        gpa
+------------+--------------------
+ Gryffindor | 8.0909090909090909
+ Hufflepuff | 6.8000000000000000
+ Ravenclaw  | 7.4688888888888889
+ Slytherin  | 7.5833333333333333
+(4 rows)
+
+-------------------------------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------------------------------
+
+Answer 10: ****
+
+Students in Slytherin with GPA higher than mean GPA in Slytherin: (student name)
+
+
+
+SELECT name FROM 
+(SELECT * FROM grades
+JOIN houses
+ON SUBSTRING(grades.Rollno,1,3)=houses.housecode
+JOIN students
+ON students.Rollno=grades.Rollno
+JOIN gradepoint
+ON gradepoint.Lettergrade=grades.grade
+WHERE houses.housename='Slytherin') as sly_t
+GROUP BY name
+HAVING AVG(gradepoint)>
+(SELECT GPA FROM 
+houses JOIN
+(SELECT SUBSTRING(rollno,1,3) as housecode, AVG(gpa) as gpa FROM 
+(SELECT Rollno, AVG(Gradepoint) as GPA FROM Gradepoint 
+JOIN grades ON Gradepoint.Lettergrade = grades.Grade
+GROUP BY Rollno) as gpa_t
+GROUP BY SUBSTRING(rollno,1,3)) as h_gpa
+ON h_gpa.housecode=houses.housecode
+WHERE housename='Slytherin')
+
+
+
+        name
+--------------------
+ Avery
+ Katie Bell
+ Melinda Bobbin
+ Michael Corner
+ Hannah Abbott
+ Sirius Orion Black
+ Owen Cauldwell
+ Stewart Ackerley
+ Marcus Belby
+(9 rows)
+
+
+-------------------------------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------------------------------
+
+Answer 11:
+
+SELECT name FROM 
+(SELECT * FROM grades
+JOIN houses
+ON SUBSTRING(grades.Rollno,1,3)=houses.housecode
+JOIN students
+ON students.Rollno=grades.Rollno
+JOIN gradepoint
+ON gradepoint.Lettergrade=grades.grade
+WHERE houses.housename='Hufflepuff') as hup_t
+GROUP BY name
+HAVING AVG(gradepoint)>
+(SELECT GPA FROM 
+houses JOIN
+(SELECT SUBSTRING(rollno,1,3) as housecode, AVG(gpa) as gpa FROM 
+(SELECT Rollno, AVG(Gradepoint) as GPA FROM Gradepoint 
+JOIN grades ON Gradepoint.Lettergrade = grades.Grade
+GROUP BY Rollno) as gpa_t
+GROUP BY SUBSTRING(rollno,1,3)) as h_gpa
+ON h_gpa.housecode=houses.housecode
+WHERE housename='Gryffindor')
+
+
+    name
+------------
+ Lee Jordan
+(1 row)
+
+
+----------------------------------------------------------------------------------------------------------------------------------------------------
+-----------------------------x------------------------------x----------------------x----------------------------x------------------------------------
